@@ -11,7 +11,7 @@ import SwiftUI
 // MARK: - `Store` -
 
 /// A `Store` class manages state in a Redux-style architecture. The `Store` class takes a generic type `Reducer` that conforms to the `Reducing` protocol.
-final class Store<Reducer: Reducing>: ObservableObject {
+public final class Store<Reducer: Reducing>: ObservableObject {
     
     // MARK: - `Private Properties` -
     
@@ -22,7 +22,7 @@ final class Store<Reducer: Reducing>: ObservableObject {
     @Published var state: Reducer.State
     
     /// The current view rendered by the `Reducer` instance.
-    @Published var view: Reducer.Rendering?
+    @Published public var view: Reducer.Rendering?
     
     /// The `Sink` instance used by the `Reducer` instance.
     private (set) var sink: Sink<Reducer>?
@@ -35,7 +35,7 @@ final class Store<Reducer: Reducing>: ObservableObject {
     
     // MARK: - `Init` -
     
-    init(
+    public init(
         _ reducer: Reducer
     ) {
         self.reducer = reducer

@@ -27,12 +27,12 @@ public struct Sink<Reducer: Reducing> {
     // MARK: - `Public Methods` - 
     
     /// Sends the given action to the store
-    func send(_ action: Reducer.Action) {
+    public func send(_ action: Reducer.Action) {
         store.send(action)
     }
     
     /// Binds a view property to a corresponding reducer action
-    func bindState<Value: Equatable>(
+    public func bindState<Value: Equatable>(
         _ value: KeyPath<Reducer.State, Value>,
         _ action: @Sendable @escaping (Value) -> Reducer.Action
     ) -> Binding<Value> {
