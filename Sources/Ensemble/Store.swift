@@ -72,9 +72,9 @@ public final class Store<Reducer: Reducing>: ObservableObject {
             return copy
         }
         .receive(on: DispatchQueue.main)
-        .sink {
-            self.state = $0
-            self.view = reducer.render(sink, $0)
+        .sink { [weak self] in
+            self?.state = $0
+            self?.view = reducer.render(sink, $0)
         }
         .store(in: &cancellables)
     }
