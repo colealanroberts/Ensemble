@@ -11,17 +11,19 @@ import Foundation
 
 /// A box type for managing asynchronous work
 public struct Worker<Action> {
+    
     enum Operation {
         case none
         case task(() async -> Action)
     }
     
+    let id: String = UUID().uuidString
     let operatoin: Operation
     
+    // MARK: - `Init` -
     init(operation: Operation) {
         self.operatoin = operation
     }
-    // MARK: - `Private Properties` -
 }
 
 extension Worker {

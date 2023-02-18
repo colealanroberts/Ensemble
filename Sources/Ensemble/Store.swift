@@ -33,7 +33,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     /// A set of `AnyCancellable` instances used to store the cancellable objects created by the `reduce` method.
     private var cancellables: Set<AnyCancellable>
     
-    private var effectTasks: Set<Task<Void, Never>>
+    private var effectTasks: [String: Task<Void, Never>]
     
     // MARK: - `Init` -
     
@@ -52,7 +52,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     }
     
     deinit {
-        effectTasks.forEach { task in
+        effectTasks.forEach { _, task in
             task.cancel()
         }
     }
@@ -77,7 +77,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
             let worker = reducer.reduce(&copy, action: action)
             switch worker.operatoin {
             case .task(let opertion):
-                self?.runEffect(opertion)
+                self?.runEffect(id: worker.id, operation: opertion)
             case .none:
                 break
             }
@@ -93,12 +93,13 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     
     /// Asynchronous actions that are returned by the `Reducer`'s `reduce` method.
     /// It runs the asynchronous action and sends the resulting action to the `subject` instance by calling the `send` method.
-    private func runEffect(_ operation : @escaping () async -> Reducer.Action) {
-        effectTasks.insert(
-            Task {
-                let action = await operation()
-                send(action)
-            }
-        )
+    private func runEffect(id: String, operation : @escaping () async -> Reducer.Action) {
+        if let prevousTask = effectTasks[id] {
+            prevousTask.cancel()
+        }
+        effectTasks[id] = Task {
+            let action = await operation()
+            send(action)
+        }
     }
 }

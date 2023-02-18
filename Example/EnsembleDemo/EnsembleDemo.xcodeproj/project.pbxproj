@@ -35,8 +35,8 @@
 		BBE8072929A01A75003F0A88 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		BBE8072B29A01A77003F0A88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BBE8072E29A01A77003F0A88 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		BBE8073629A01A97003F0A88 /* Ensemble */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Ensemble; path = ../../Development/Ensemble; sourceTree = "<group>"; };
 		BBF3390A29A12B0C001792FD /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
+		FD13510129A14ACC0025C2E3 /* Ensemble */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Ensemble; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,7 +131,7 @@
 		BBE8073529A01A97003F0A88 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				FD13510029A074570025C2E3 /* Ensemble */,
+				FD13510129A14ACC0025C2E3 /* Ensemble */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
