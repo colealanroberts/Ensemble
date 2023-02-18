@@ -10,24 +10,26 @@ import Foundation
 // MARK: - `Worker` -
 
 /// A box type for managing asynchronous work
-public struct Worker<Reducer: Reducing>: Equatable {
-    
-    // MARK: - `Private Properties` -
-    
-    private let id = UUID()
-    
-    // MARK: - `Public` - 
-    
-    /// The operation to run, returning an `Action` from the inferred `Reducer`
-    public let run: () async throws -> Reducer.Action?
-    
-    // MARK: - `Init` -
-    
-    public init(run: @escaping () async throws -> Reducer.Action?) {
-        self.run = run
+public struct Worker<Action> {
+    enum Operation {
+        case none
+        case task(() async -> Action)
     }
     
-    public static func == (lhs: Worker<Reducer>, rhs: Worker<Reducer>) -> Bool {
-        lhs.id == rhs.id
+    let operatoin: Operation
+    
+    init(operation: Operation) {
+        self.operatoin = operation
+    }
+    // MARK: - `Private Properties` -
+}
+
+extension Worker {
+    public static var none: Self {
+        Self(operation: .none)
+    }
+    
+    public static func task(operation: @escaping () async -> Action) -> Self {
+        Self(operation: .task(operation))
     }
 }

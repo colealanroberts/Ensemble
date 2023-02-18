@@ -33,6 +33,8 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     /// A set of `AnyCancellable` instances used to store the cancellable objects created by the `reduce` method.
     private var cancellables: Set<AnyCancellable>
     
+    private var effectTasks: Set<Task<Void, Never>>
+    
     // MARK: - `Init` -
     
     public init(
@@ -40,12 +42,19 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     ) {
         self.reducer = reducer
         self.cancellables = .init()
+        self.effectTasks = .init()
         let state = reducer.initialState()
         self.state = state
         let sink = Sink<Reducer>(self)
         self.view = reducer.render(sink, state)
         self.sink = sink
         self.reduce(reducer)
+    }
+    
+    deinit {
+        effectTasks.forEach { task in
+            task.cancel()
+        }
     }
     
     // MARK: - `Public Methods` -
@@ -65,9 +74,12 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         }
         subject.scan(state) { [weak self] current, action in
             var copy = current
-            if let effect = reducer.reduce(&copy, action: action) {
-                _ = reducer.reduce(&copy, action: effect)
-                self?.runEffect(effect)
+            let worker = reducer.reduce(&copy, action: action)
+            switch worker.operatoin {
+            case .task(let opertion):
+                self?.runEffect(opertion)
+            case .none:
+                break
             }
             return copy
         }
@@ -81,11 +93,12 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     
     /// Asynchronous actions that are returned by the `Reducer`'s `reduce` method.
     /// It runs the asynchronous action and sends the resulting action to the `subject` instance by calling the `send` method.
-    private func runEffect(_ action: Reducer.Action) {
-        Task {
-            if let action = try await action.worker() {
+    private func runEffect(_ operation : @escaping () async -> Reducer.Action) {
+        effectTasks.insert(
+            Task {
+                let action = await operation()
                 send(action)
             }
-        }
+        )
     }
 }
