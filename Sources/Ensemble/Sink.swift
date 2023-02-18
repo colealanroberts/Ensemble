@@ -33,8 +33,8 @@ public struct Sink<Reducer: Reducing> {
     
     /// Binds a view property to a corresponding reducer action
     public func bindState<Value: Equatable>(
-        _ value: KeyPath<Reducer.State, Value>,
-        _ action: @Sendable @escaping (Value) -> Reducer.Action
+        to value: KeyPath<Reducer.State, Value>,
+        send action: @Sendable @escaping (Value) -> Reducer.Action
     ) -> Binding<Value> {
         .init(
             get: { store.state[keyPath: value] },

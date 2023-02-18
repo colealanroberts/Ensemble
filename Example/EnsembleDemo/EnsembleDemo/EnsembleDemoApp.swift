@@ -10,10 +10,38 @@ import SwiftUI
 
 @main
 struct EnsembleDemoApp: App {
+    
+    // MARK: - `Private Properties` -
+    
+    private let impactGenerator: UIImpactFeedbackGenerator
+    private let sectionProvider: SectionProviding
+    
+    // MARK: - `Init` -
+    
+    init() {
+        let sectionProvider = SectionProvider(
+            decoder: .init(),
+            urlSession: .shared
+        )
+        self.sectionProvider = sectionProvider
+        
+        let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
+        impactGenerator.prepare()
+        
+        self.impactGenerator = impactGenerator
+    }
+    
+    // MARK: - `Body` -
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(Store(CounterStore()))
+            RootView()
+                .environmentObject(
+                    Store(RootStore(
+                        impactGenerator: impactGenerator,
+                        sectionProvider: sectionProvider
+                    ))
+                )
         }
     }
 }

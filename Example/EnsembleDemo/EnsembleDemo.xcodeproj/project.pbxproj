@@ -8,21 +8,35 @@
 
 /* Begin PBXBuildFile section */
 		BBE2937F29A01AF800AB84B3 /* Ensemble in Frameworks */ = {isa = PBXBuildFile; productRef = BBE2937E29A01AF800AB84B3 /* Ensemble */; };
-		BBE2938129A01B0500AB84B3 /* CounterStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2938029A01B0500AB84B3 /* CounterStore.swift */; };
+		BBE2938129A01B0500AB84B3 /* RootStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2938029A01B0500AB84B3 /* RootStore.swift */; };
+		BBE2938429A0909B00AB84B3 /* SectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2938329A0909B00AB84B3 /* SectionView.swift */; };
+		BBE2938729A0920400AB84B3 /* SectionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2938629A0920400AB84B3 /* SectionProvider.swift */; };
+		BBE2938A29A092C400AB84B3 /* Article.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2938929A092C400AB84B3 /* Article.swift */; };
+		BBE2938C29A093F700AB84B3 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2938B29A093F700AB84B3 /* Data.swift */; };
+		BBE2938E29A09B9C00AB84B3 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE2938D29A09B9C00AB84B3 /* WebView.swift */; };
 		BBE8072829A01A75003F0A88 /* EnsembleDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE8072729A01A75003F0A88 /* EnsembleDemoApp.swift */; };
-		BBE8072A29A01A75003F0A88 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE8072929A01A75003F0A88 /* ContentView.swift */; };
+		BBE8072A29A01A75003F0A88 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE8072929A01A75003F0A88 /* RootView.swift */; };
 		BBE8072C29A01A77003F0A88 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBE8072B29A01A77003F0A88 /* Assets.xcassets */; };
 		BBE8072F29A01A77003F0A88 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBE8072E29A01A77003F0A88 /* Preview Assets.xcassets */; };
+		BBF3390B29A12B0C001792FD /* Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBF3390A29A12B0C001792FD /* Section.swift */; };
+		BBF3390E29A13435001792FD /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = BBF3390D29A13435001792FD /* Nuke */; };
+		BBF3391029A13435001792FD /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = BBF3390F29A13435001792FD /* NukeUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		BBE2938029A01B0500AB84B3 /* CounterStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterStore.swift; sourceTree = "<group>"; };
+		BBE2938029A01B0500AB84B3 /* RootStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootStore.swift; sourceTree = "<group>"; };
+		BBE2938329A0909B00AB84B3 /* SectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionView.swift; sourceTree = "<group>"; };
+		BBE2938629A0920400AB84B3 /* SectionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionProvider.swift; sourceTree = "<group>"; };
+		BBE2938929A092C400AB84B3 /* Article.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Article.swift; sourceTree = "<group>"; };
+		BBE2938B29A093F700AB84B3 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		BBE2938D29A09B9C00AB84B3 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		BBE8072429A01A75003F0A88 /* EnsembleDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EnsembleDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE8072729A01A75003F0A88 /* EnsembleDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnsembleDemoApp.swift; sourceTree = "<group>"; };
-		BBE8072929A01A75003F0A88 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BBE8072929A01A75003F0A88 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		BBE8072B29A01A77003F0A88 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BBE8072E29A01A77003F0A88 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		BBE8073629A01A97003F0A88 /* Ensemble */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Ensemble; path = ../../Development/Ensemble; sourceTree = "<group>"; };
+		BBF3390A29A12B0C001792FD /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -30,7 +44,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBF3391029A13435001792FD /* NukeUI in Frameworks */,
 				BBE2937F29A01AF800AB84B3 /* Ensemble in Frameworks */,
+				BBF3390E29A13435001792FD /* Nuke in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +58,33 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BBE2938229A0909300AB84B3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BBE2938329A0909B00AB84B3 /* SectionView.swift */,
+				BBE2938D29A09B9C00AB84B3 /* WebView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BBE2938529A091DA00AB84B3 /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				BBE2938629A0920400AB84B3 /* SectionProvider.swift */,
+			);
+			path = Providers;
+			sourceTree = "<group>";
+		};
+		BBE2938829A092BC00AB84B3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BBE2938929A092C400AB84B3 /* Article.swift */,
+				BBE2938B29A093F700AB84B3 /* Data.swift */,
+				BBF3390A29A12B0C001792FD /* Section.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		BBE8071B29A01A75003F0A88 = {
@@ -65,11 +108,14 @@
 		BBE8072629A01A75003F0A88 /* EnsembleDemo */ = {
 			isa = PBXGroup;
 			children = (
+				BBE2938829A092BC00AB84B3 /* Models */,
+				BBE2938529A091DA00AB84B3 /* Providers */,
+				BBE2938229A0909300AB84B3 /* Views */,
 				BBE8072729A01A75003F0A88 /* EnsembleDemoApp.swift */,
-				BBE8072929A01A75003F0A88 /* ContentView.swift */,
+				BBE8072929A01A75003F0A88 /* RootView.swift */,
 				BBE8072B29A01A77003F0A88 /* Assets.xcassets */,
 				BBE8072D29A01A77003F0A88 /* Preview Content */,
-				BBE2938029A01B0500AB84B3 /* CounterStore.swift */,
+				BBE2938029A01B0500AB84B3 /* RootStore.swift */,
 			);
 			path = EnsembleDemo;
 			sourceTree = "<group>";
@@ -108,6 +154,8 @@
 			name = EnsembleDemo;
 			packageProductDependencies = (
 				BBE2937E29A01AF800AB84B3 /* Ensemble */,
+				BBF3390D29A13435001792FD /* Nuke */,
+				BBF3390F29A13435001792FD /* NukeUI */,
 			);
 			productName = EnsembleDemo;
 			productReference = BBE8072429A01A75003F0A88 /* EnsembleDemo.app */;
@@ -137,6 +185,9 @@
 				Base,
 			);
 			mainGroup = BBE8071B29A01A75003F0A88;
+			packageReferences = (
+				BBF3390C29A13435001792FD /* XCRemoteSwiftPackageReference "Nuke" */,
+			);
 			productRefGroup = BBE8072529A01A75003F0A88 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -163,8 +214,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BBE8072A29A01A75003F0A88 /* ContentView.swift in Sources */,
-				BBE2938129A01B0500AB84B3 /* CounterStore.swift in Sources */,
+				BBF3390B29A12B0C001792FD /* Section.swift in Sources */,
+				BBE2938C29A093F700AB84B3 /* Data.swift in Sources */,
+				BBE2938E29A09B9C00AB84B3 /* WebView.swift in Sources */,
+				BBE2938429A0909B00AB84B3 /* SectionView.swift in Sources */,
+				BBE8072A29A01A75003F0A88 /* RootView.swift in Sources */,
+				BBE2938A29A092C400AB84B3 /* Article.swift in Sources */,
+				BBE2938729A0920400AB84B3 /* SectionProvider.swift in Sources */,
+				BBE2938129A01B0500AB84B3 /* RootStore.swift in Sources */,
 				BBE8072829A01A75003F0A88 /* EnsembleDemoApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -367,10 +424,31 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		BBF3390C29A13435001792FD /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		BBE2937E29A01AF800AB84B3 /* Ensemble */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Ensemble;
+		};
+		BBF3390D29A13435001792FD /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBF3390C29A13435001792FD /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		BBF3390F29A13435001792FD /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BBF3390C29A13435001792FD /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
