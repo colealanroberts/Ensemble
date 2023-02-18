@@ -75,9 +75,9 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         subject.scan(state) { [weak self] current, action in
             var copy = current
             let worker = reducer.reduce(&copy, action: action)
-            switch worker.operatoin {
-            case .task(let opertion):
-                self?.runEffect(id: worker.id, operation: opertion)
+            switch worker.operation {
+            case .task(let operation):
+                self?.runEffect(id: worker.id, operation: operation)
             case .none:
                 break
             }
@@ -94,8 +94,8 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     /// Asynchronous actions that are returned by the `Reducer`'s `reduce` method.
     /// It runs the asynchronous action and sends the resulting action to the `subject` instance by calling the `send` method.
     private func runEffect(id: String, operation : @escaping () async -> Reducer.Action) {
-        if let prevousTask = effectTasks[id] {
-            prevousTask.cancel()
+        if let previousTask = effectTasks[id] {
+            previousTask.cancel()
         }
         effectTasks[id] = Task {
             let action = await operation()

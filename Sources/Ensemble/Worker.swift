@@ -18,11 +18,11 @@ public struct Worker<Action> {
     }
     
     let id: String = UUID().uuidString
-    let operatoin: Operation
+    let operation: Operation
     
     // MARK: - `Init` -
     init(operation: Operation) {
-        self.operatoin = operation
+        self.operation = operation
     }
 }
 
