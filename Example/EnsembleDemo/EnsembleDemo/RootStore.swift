@@ -48,7 +48,7 @@ extension RootStore {
         )
     }
     
-    func reduce(_ state: inout State, action: Action) -> Action? {
+    func reduce(_ state: inout State, action: Action) -> Worker<Action> {
         switch action {
         case .articles(let articles):
             state.isFetching = false
@@ -62,34 +62,27 @@ extension RootStore {
             state.selectedSection = section
             state.isFetching = true
             state.impactGenerator.impactOccurred()
-            
-            return .worker(
-                Worker {
+            return .task {
+                do {
                     let articles = try await sectionProvider.fetch(for: section)
                     return .articles(articles)
+                } catch {
+                    return .articles([])
                 }
-            )
-        case .worker(_):
-            break
+            }
         }
-        return nil
+        return .none
     }
 }
 
 // MARK: - `Action` -
 
 extension RootStore {
-    enum Action: Equatable, Working {
+    enum Action: Equatable {
         case articles([Article])
         case selectSection(Section)
         case selectArticle(Article)
         case webview(isPresented: Bool)
-        case worker(Worker<RootStore>)
-        
-        func worker() async throws -> RootStore.Action? {
-            guard case .worker(let worker) = self else { return nil }
-            return try await worker.run()
-        }
     }
 }
 

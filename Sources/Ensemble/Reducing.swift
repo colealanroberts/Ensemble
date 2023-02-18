@@ -15,7 +15,7 @@ import SwiftUI
 public protocol Reducing {
     
     /// The type of action that can be dispatched to the reducer.
-    associatedtype Action: Working
+    associatedtype Action
     
     /// The type of state that the reducer manages.
     associatedtype State: Equatable
@@ -29,7 +29,7 @@ public protocol Reducing {
     
     /// Takes a mutable state object and an action and applies the action to
     /// the state object. Returns an optional effect action.
-    func reduce(_ state: inout State, action: Action) -> Action?
+    func reduce(_ state: inout State, action: Action) -> Worker<Action>
     
     /// Generates a rendering from the state object and a sink object that
     /// can be used to dispatch actions.
