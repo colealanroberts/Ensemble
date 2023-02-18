@@ -105,12 +105,6 @@ extension RootStore {
             )
             .frame(height: 50)
             
-            if state.isFetching {
-                ProgressView()
-                    .tint(.white)
-                    .padding()
-            }
-            
             List(state.articles) { article in
                 LazyVStack(spacing: 24) {
                     VStack(alignment: .leading, spacing: 8) {

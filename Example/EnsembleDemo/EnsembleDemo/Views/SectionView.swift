@@ -26,9 +26,10 @@ struct SectionView: View {
                         ForEach(sections, id: \.self) { section in
                             VStack {
                                 PillView(
+                                    namespace: selectionIndicator,
                                     proxy: proxy,
                                     section: section,
-                                    selected: section == selectedSection,
+                                    selectedId: selectedSection.title,
                                     sink: sink
                                 )
                             }
@@ -49,26 +50,42 @@ struct SectionView: View {
 fileprivate extension SectionView {
     struct PillView: View {
         
+        let namespace: Namespace.ID
         let proxy: ScrollViewProxy
         let section: Section
-        let selected: Bool
+        let selectedId: String
         let sink: Sink<RootStore>
         
+        var selected: Bool {
+            section.title == selectedId
+        }
+        
         var body: some View {
-            Text(section.title)
-                .onTapGesture {
-                    withAnimation {
-                        sink.send(.selectSection(section))
-                        proxy.scrollTo(section.title, anchor: .center)
-                    }
+            ZStack {
+                if selected {
+                    RoundedRectangle(cornerRadius: 20.0)
+                        .fill(selected ? .white : .clear)
+                        .cornerRadius(20.0)
+                        .matchedGeometryEffect(id: "category", in: namespace)
                 }
-                .font(.system(size: 14, weight: .medium))
-                .padding(.horizontal, 16)
-                .padding(.vertical, 6)
-                .background(selected ? .white : .clear)
-                .foregroundColor(selected ? .black : .white)
-                .cornerRadius(20.0)
-                .id(section.title)
+                    
+                Text(section.title)
+                    .foregroundColor(selected ? .black : .white)
+                    .font(.system(size: 14, weight: .medium))
+                    .id(section.title)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 4)
+            }
+            .animation(
+                .easeInOut(duration: 0.2),
+                value: selected
+            )
+            .onTapGesture {
+                withAnimation {
+                    sink.send(.selectSection(section))
+                    proxy.scrollTo(section.title, anchor: .center)
+                }
+            }
         }
     }
 }
