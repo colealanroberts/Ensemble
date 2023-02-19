@@ -7,8 +7,8 @@
 
 import Ensemble
 import Foundation
-import NukeUI
 import SwiftUI
+import UIKit
 
 struct RootStore: Reducing {
     let impactGenerator: UIImpactFeedbackGenerator
@@ -21,6 +21,8 @@ extension RootStore {
     struct State: Equatable {
         
         var articles: [Article]
+        
+        var hasPerformedInitialLayout: Int
         
         let impactGenerator: UIImpactFeedbackGenerator
         
@@ -35,11 +37,16 @@ extension RootStore {
         var sections: [Section] {
             Section.allCases
         }
+        
+        var shouldAnimateLayoutChanges: Bool {
+            isFetching && hasPerformedInitialLayout > 0
+        }
     }
     
     func initialState() -> State {
         .init(
             articles: [],
+            hasPerformedInitialLayout: 0,
             impactGenerator: impactGenerator,
             isFetching: false,
             isPresentingWebView: false,
@@ -53,8 +60,8 @@ extension RootStore {
         case .articles(let articles):
             state.isFetching = false
             state.articles = articles.filter(\.isPresentable)
-        case .webview(let isPresented):
-            state.isPresentingWebView = isPresented
+        case .performedInitialLayout:
+            state.hasPerformedInitialLayout += 1
         case .selectArticle(let article):
             state.selectedArticle = article
             state.isPresentingWebView = true
@@ -70,6 +77,8 @@ extension RootStore {
                     return .articles([])
                 }
             }
+        case .webview(let isPresented):
+            state.isPresentingWebView = isPresented
         }
         return .none
     }
@@ -80,6 +89,7 @@ extension RootStore {
 extension RootStore {
     enum Action: Equatable {
         case articles([Article])
+        case performedInitialLayout
         case selectSection(Section)
         case selectArticle(Article)
         case webview(isPresented: Bool)
@@ -90,41 +100,26 @@ extension RootStore {
 
 extension RootStore {
     @MainActor func render(_ sink: Sink<RootStore>, _ state: State) -> some View {
-        VStack(spacing: 0) {
-            SectionView(
-                selectedSection: state.selectedSection,
-                sections: state.sections,
+        ZStack(alignment: .top) {
+            VStack {
+                ScrollView {
+                    Spacer().frame(height: 112)
+                    ForEach(state.articles) { article in
+                        ArticleView(
+                            article: article,
+                            sink: sink
+                        )
+                    }
+                    .onAppear {
+                        sink.send(.performedInitialLayout)
+                    }
+                }
+                .animation(.easeIn, value: state.shouldAnimateLayoutChanges)
+            }
+            NavbarView(
+                state: state,
                 sink: sink
             )
-            .frame(height: 50)
-            
-            List(state.articles) { article in
-                LazyVStack(spacing: 24) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(article.title)
-                            .font(
-                                .system(.title3, design: .serif)
-                            )
-                        
-                        Text(article.abstract)
-                            .foregroundColor(.secondary)
-                            .font(.system(size: 14))
-                    }
-                    
-                    if let coverImageURL = article.coverImageURL {
-                        LazyImage(
-                            url: .init(string: coverImageURL)!
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: 3.0))
-                        .aspectRatio(contentMode: .fill)
-                    }
-                }
-                .padding(6)
-                .onTapGesture {
-                    sink.send(.selectArticle(article))
-                }
-            }
-            .animation(.easeIn, value: state.isFetching)
         }
         .sheet(
             isPresented: sink.bindState(
@@ -141,21 +136,6 @@ extension RootStore {
             guard state.articles.isEmpty else { return }
             sink.send(.selectSection(state.selectedSection))
         }
-        .background(.black)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                Image("nyt")
-                    .resizable()
-                    .renderingMode(.template)
-                    .foregroundColor(.white)
-                    .scaledToFit()
-                    .frame(width: 30, height: 28)
-            }
-        }
-        .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarBackground(.black, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
-        .navigationTitle(state.selectedSection.title)
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
     }
 }

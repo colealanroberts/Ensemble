@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 // MARK: - `RootStore.Section` -
 
 enum Section: Equatable, CaseIterable {

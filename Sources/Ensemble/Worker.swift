@@ -10,11 +10,11 @@ import Foundation
 // MARK: - `Worker` -
 
 /// A box type for managing asynchronous work
-public struct Worker<Action> {
+public struct Worker<T> {
     
     enum Operation {
         case none
-        case task(() async -> Action)
+        case task(() async -> T)
     }
     
     let id: String = UUID().uuidString
@@ -31,7 +31,7 @@ extension Worker {
         Self(operation: .none)
     }
     
-    public static func task(operation: @escaping () async -> Action) -> Self {
+    public static func task(operation: @escaping () async -> T) -> Self {
         Self(operation: .task(operation))
     }
 }
