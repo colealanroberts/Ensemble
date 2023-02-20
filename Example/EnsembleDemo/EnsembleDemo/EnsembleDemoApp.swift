@@ -21,7 +21,8 @@ struct EnsembleDemoApp: App {
     init() {
         let sectionProvider = SectionProvider(
             decoder: .init(),
-            urlSession: .shared
+            urlSession: .shared,
+            userDefaults: .standard
         )
         self.sectionProvider = sectionProvider
         

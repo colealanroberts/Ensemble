@@ -37,7 +37,7 @@ enum Section: Equatable, CaseIterable {
         }
     }
     
-    var json: String {
+    var slug: String {
         switch self {
         case .home:
             return "home"
