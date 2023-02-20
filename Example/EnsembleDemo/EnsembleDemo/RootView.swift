@@ -19,4 +19,3 @@ struct RootView: View {
         .navigationViewStyle(.stack)
     }
 }
-
