@@ -10,8 +10,9 @@ import Foundation
 import SwiftUI
 import UIKit
 
+// MARK: - `RootStore` -
+
 struct RootStore: Reducing {
-    let impactGenerator: UIImpactFeedbackGenerator
     let sectionProvider: SectionProviding
 }
 
@@ -23,8 +24,6 @@ extension RootStore {
         var articles: [Article]
         
         var hasPerformedInitialLayout: Int
-        
-        let impactGenerator: UIImpactFeedbackGenerator
         
         var isFetching: Bool
         
@@ -47,7 +46,6 @@ extension RootStore {
         .init(
             articles: [],
             hasPerformedInitialLayout: 0,
-            impactGenerator: impactGenerator,
             isFetching: false,
             isPresentingWebView: false,
             selectedArticle: nil,
@@ -68,7 +66,6 @@ extension RootStore {
         case .selectSection(let section):
             state.selectedSection = section
             state.isFetching = true
-            state.impactGenerator.impactOccurred()
             return .task {
                 do {
                     let articles = try await sectionProvider.fetch(for: section)
@@ -114,12 +111,14 @@ extension RootStore {
                         sink.send(.performedInitialLayout)
                     }
                 }
+                .frame(maxWidth: 600)
                 .animation(.easeIn, value: state.shouldAnimateLayoutChanges)
             }
             NavbarView(
                 state: state,
                 sink: sink
             )
+            .frame(maxWidth: .infinity, maxHeight: 96)
         }
         .sheet(
             isPresented: sink.bindState(

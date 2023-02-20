@@ -22,10 +22,9 @@ struct NavbarView: View {
                 sections: state.sections,
                 sink: sink
             )
-            .frame(height: 50)
             Spacer()
         }
+        .frame(maxWidth: .infinity)
         .background(.ultraThickMaterial)
-        .frame(height: 96)
     }
 }

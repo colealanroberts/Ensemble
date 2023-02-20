@@ -16,6 +16,7 @@ struct RootView: View {
         NavigationView {
             rootStore.view
         }
+        .navigationViewStyle(.stack)
     }
 }
 

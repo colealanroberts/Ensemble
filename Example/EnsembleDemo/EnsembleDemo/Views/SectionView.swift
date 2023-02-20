@@ -12,7 +12,7 @@ struct SectionView: View {
     
     @Namespace private var selectionIndicator
     @Environment(\.colorScheme) var colorScheme
-    
+
     let selectedSection: Section
     let sections: [Section]
     let sink: Sink<RootStore>
@@ -20,24 +20,28 @@ struct SectionView: View {
     var body: some View {
         VStack {
             Spacer()
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .center) {
-                        ForEach(sections, id: \.self) { section in
-                            PillView(
-                                namespace: selectionIndicator,
-                                proxy: proxy,
-                                section: section,
-                                selectedId: selectedSection.title,
-                                sink: sink
-                            )
-                            .id(section.title)
+            Group {
+                ScrollViewReader { proxy in
+                    ScrollView( .horizontal, showsIndicators: false) {
+                        HStack(alignment: .center) {
+                            ForEach(sections, id: \.self) { section in
+                                PillView(
+                                    namespace: selectionIndicator,
+                                    proxy: UIDevice.isPad ? nil : proxy,
+                                    section: section,
+                                    selectedId: selectedSection.title,
+                                    sink: sink
+                                )
+                                .id(section.title)
+                            }
                         }
+                        .padding(.horizontal, 16)
                     }
-                    .padding(.horizontal, 16)
                 }
+                .scrollDisabled(UIDevice.isPad)
                 .listRowInsets(.init(top: 0, leading: 16, bottom: 0, trailing: 16))
             }
+            .frame(maxWidth: UIDevice.isPad ? 690 : .infinity)
             Spacer()
         }
     }
@@ -51,7 +55,7 @@ fileprivate extension SectionView {
         @Environment(\.colorScheme) private var colorScheme
         
         let namespace: Namespace.ID
-        let proxy: ScrollViewProxy
+        let proxy: ScrollViewProxy?
         let section: Section
         let selectedId: String
         let sink: Sink<RootStore>
@@ -83,7 +87,7 @@ fileprivate extension SectionView {
             .onTapGesture {
                 withAnimation {
                     sink.send(.selectSection(section))
-                    proxy.scrollTo(section.title, anchor: .center)
+                    proxy?.scrollTo(section.title, anchor: .center)
                 }
             }
         }
