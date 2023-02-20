@@ -13,8 +13,8 @@ struct EnsembleDemoApp: App {
     
     // MARK: - `Private Properties` -
     
-    private let impactGenerator: UIImpactFeedbackGenerator
     private let sectionProvider: SectionProviding
+    private let rootStore: RootStore
     
     // MARK: - `Init` -
     
@@ -26,23 +26,18 @@ struct EnsembleDemoApp: App {
         )
         self.sectionProvider = sectionProvider
         
-        let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
-        impactGenerator.prepare()
+        let rootStore = RootStore(
+            sectionProvider: sectionProvider
+        )
         
-        self.impactGenerator = impactGenerator
+        self.rootStore = rootStore
     }
     
     // MARK: - `Body` -
     
     var body: some Scene {
         WindowGroup {
-            RootView()
-                .environmentObject(
-                    Store(RootStore(
-                        impactGenerator: impactGenerator,
-                        sectionProvider: sectionProvider
-                    ))
-                )
+            RootView().environmentObject(Store(rootStore))
         }
     }
 }
