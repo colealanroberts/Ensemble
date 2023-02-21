@@ -16,7 +16,6 @@ public struct Screen<Content: View, Reducer: Reducing>: View {
     // MARK: - `Private Properties` -
     
     private let content: (Sink<Reducer>, Reducer.State) -> Content
-    private let sink: Sink<Reducer>
     
     // MARK: - `Init` -
     
@@ -33,13 +32,12 @@ public struct Screen<Content: View, Reducer: Reducing>: View {
         @ViewBuilder _ content: @escaping (Sink<Reducer>, Reducer.State) -> Content
     ) {
         self.content = content
-        self.sink = Sink(store)
         self._store = StateObject(wrappedValue: store)
     }
     
     // MARK: - `Body` -
     
     public var body: some View {
-        content(sink, store.state)
+        content(store.sink, store.state)
     }
 }

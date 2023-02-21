@@ -13,6 +13,13 @@ import SwiftUI
 /// A `Store` class manages state in a Redux-style architecture. The `Store` class takes a generic type `Reducer` that conforms to the `Reducing` protocol.
 public final class Store<Reducer: Reducing>: ObservableObject {
     
+    // MARK: - `Public Properties` -
+    
+    /// The `Sink` instance used by the `Reducer` instance.
+    public lazy var sink: Sink<Reducer> = {
+        .init(self)
+    }()
+    
     // MARK: - `Private Properties` -
     
     /// The `Reducer` instance passed in the initializer.
@@ -23,9 +30,6 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     
     /// The current view rendered by the `Reducer` instance.
     @Published public var view: Reducer.Rendering?
-    
-    /// The `Sink` instance used by the `Reducer` instance.
-    private (set) var sink: Sink<Reducer>?
     
     /// Sends actions to the `reduce` method.
     private var subject = PassthroughSubject<Reducer.Action, Never>()
@@ -45,9 +49,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         self.effectTasks = .init()
         let state = reducer.initialState()
         self.state = state
-        let sink = Sink<Reducer>(self)
         self.view = reducer.render(sink, state)
-        self.sink = sink
         self.reduce(reducer)
     }
     
@@ -69,9 +71,6 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     /// Receives actions from the `subject`, reduces them, and updates the store's state and view.
     /// It uses a `scan` operator to update the state and returns the updated state in a `sink` operator to update the view.
     private func reduce(_ reducer: Reducer) {
-        guard let sink else {
-            fatalError("Sink was unexpectedly nil!")
-        }
         subject.scan(state) { [weak self] current, action in
             var copy = current
             let worker = reducer.reduce(&copy, action: action)
@@ -85,8 +84,9 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         }
         .receive(on: DispatchQueue.main)
         .sink { [weak self] in
-            self?.state = $0
-            self?.view = reducer.render(sink, $0)
+            guard let self = self else { return }
+            self.state = $0
+            self.view = reducer.render(self.sink, $0)
         }
         .store(in: &cancellables)
     }
