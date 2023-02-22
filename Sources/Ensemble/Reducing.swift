@@ -1,14 +1,6 @@
-//
-//  Reducing.swift
-//  Koko
-//
-//  Created by Cole Roberts on 2/14/23.
-//
-
-import Combine
 import SwiftUI
 
-// MARK: - Reducing Protocol
+// MARK: - `Reducing` -
 
 /// The `Reducing` protocol defines a set of requirements for creating a reducer
 /// that can be used with the `Store` class.

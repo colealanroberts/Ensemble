@@ -1,10 +1,3 @@
-//
-//  Store.swift
-//  Koko
-//
-//  Created by Cole Roberts on 2/14/23.
-//
-
 import Combine
 import SwiftUI
 

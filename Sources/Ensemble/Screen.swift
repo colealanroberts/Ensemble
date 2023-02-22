@@ -1,12 +1,8 @@
-//
-//  Screen.swift
-//
-//
-//  Created by Cole Roberts on 2/20/23.
-//
-
 import SwiftUI
 
+// MARK: - `Screen` -
+
+/// A SwiftUI view that encapsulates a stateful screen with a reducer.
 public struct Screen<Content: View, Reducer: Reducing>: View {
     
     // MARK: - `StateObject` -
@@ -19,6 +15,11 @@ public struct Screen<Content: View, Reducer: Reducing>: View {
     
     // MARK: - `Init` -
     
+    /// Initializes a new `Screen` view with a stateful reducer and a closure that provides the view content.
+    ///
+    /// - Parameters:
+    ///   - reducer: The reducer that manages the state of the screen.
+    ///   - content: A closure that takes a sink and the current state of the reducer as parameters and returns a `View`.
     public init(
         reducer: Reducer,
         @ViewBuilder _ content: @escaping (Sink<Reducer>, Reducer.State) -> Content
@@ -27,6 +28,11 @@ public struct Screen<Content: View, Reducer: Reducing>: View {
         self.init(store: store, content)
     }
     
+    /// Initializes a new `Screen` view with an existing store and a closure that provides the view content.
+    ///
+    /// - Parameters:
+    ///   - store: An existing store that manages the state of the screen.
+    ///   - content: A closure that takes a sink and the current state of the reducer as parameters and returns a `View`.
     public init(
         store: Store<Reducer>,
         @ViewBuilder _ content: @escaping (Sink<Reducer>, Reducer.State) -> Content
@@ -37,6 +43,7 @@ public struct Screen<Content: View, Reducer: Reducing>: View {
     
     // MARK: - `Body` -
     
+    /// The view's body.
     public var body: some View {
         content(store.sink, store.state)
     }
