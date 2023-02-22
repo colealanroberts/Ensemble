@@ -53,7 +53,7 @@ extension RootStore {
         )
     }
     
-    func reduce(_ state: inout State, action: Action) -> Worker<Action> {
+    func reduce(_ state: inout State, action: Action) -> Worker<Self, Action> {
         switch action {
         case .articles(let articles):
             state.isFetching = false
@@ -66,14 +66,12 @@ extension RootStore {
         case .selectSection(let section):
             state.selectedSection = section
             state.isFetching = true
-            return .task {
-                do {
-                    let articles = try await sectionProvider.fetch(for: section)
-                    return .articles(articles)
-                } catch {
-                    return .articles([])
-                }
-            }
+            return .task ({
+                let articles = try await sectionProvider.fetch(for: section)
+                return .articles(articles)
+            }, error: { error in
+                return .articles([])
+            })
         case .webview(let isPresented):
             state.isPresentingWebView = isPresented
         }

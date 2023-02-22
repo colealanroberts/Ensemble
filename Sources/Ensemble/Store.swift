@@ -68,8 +68,13 @@ public final class Store<Reducer: Reducing>: ObservableObject {
             var copy = current
             let worker = reducer.reduce(&copy, action: action)
             switch worker.operation {
-            case .task(let operation):
-                self?.runEffect(id: worker.id, operation: operation)
+            case .task(let priority, let operation, let error):
+                self?.runEffect(
+                    id: worker.id,
+                    priority: priority,
+                    operation: operation,
+                    error: error
+                )
             case .none:
                 break
             }
@@ -86,13 +91,24 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     
     /// Asynchronous actions that are returned by the `Reducer`'s `reduce` method.
     /// It runs the asynchronous action and sends the resulting action to the `subject` instance by calling the `send` method.
-    private func runEffect(id: String, operation : @escaping () async -> Reducer.Action) {
+    private func runEffect(
+        id: String,
+        priority: TaskPriority,
+        operation: @escaping () async throws -> Reducer.Action,
+        error onError: ((any Error) -> Reducer.Action)?
+    ) {
         if let previousTask = effectTasks[id] {
             previousTask.cancel()
         }
-        effectTasks[id] = Task {
-            let action = await operation()
-            send(action)
+        effectTasks[id] = Task(priority: priority) {
+            do {
+                let action = try await operation()
+                send(action)
+            } catch {
+                if let onError = onError {
+                    send(onError(error))
+                }
+            }
         }
     }
 }

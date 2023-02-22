@@ -3,11 +3,15 @@ import Foundation
 // MARK: - `Worker` -
 
 /// A box type for managing asynchronous work.
-public struct Worker<T> {
-    
+public struct Worker<Reducer: Reducing, T>: Sendable {
     enum Operation {
         case none
-        case task(() async -> T)
+        
+        case task(
+            priority: TaskPriority,
+            operation: () async throws -> T,
+            error: ((any Error) -> Reducer.Action)?
+        )
     }
     
     /// A unique identifier for the worker instance.
@@ -31,16 +35,21 @@ public struct Worker<T> {
 
 extension Worker {
     
-    /// A worker instance that performs no operation.
+    /// A Worker instance that performs no operation.
     public static var none: Self {
         Self(operation: .none)
     }
     
-    /// Creates a worker instance with the given operation.
-    ///
+    /// Creates a Worker instance with the given operation.
+    /// - Parameter priority: The `TaskPriority` of the operation, defaulting to `.medium`
     /// - Parameter operation: The asynchronous operation the worker will perform.
+    /// - Parameter error: The error, if any, and `Action` to perform
     /// - Returns: A new `Worker` instance that performs the given operation.
-    public static func task(operation: @escaping () async -> T) -> Self {
-        Self(operation: .task(operation))
+    public static func task(
+        priority: TaskPriority = .medium,
+        _ operation: @escaping () async throws -> T,
+        error: ((any Error) -> Reducer.Action)? = nil
+    ) -> Self {
+        Self(operation: .task(priority: priority, operation: operation, error: error))
     }
 }
