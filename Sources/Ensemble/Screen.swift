@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - `Screen` -
 
 /// A SwiftUI view that encapsulates a stateful screen with a reducer.
-public struct Screen<Content: View, Reducer: Reducing>: View {
+public struct Screen<Content: View, Reducer: Reducing>: View, Sendable {
     
     // MARK: - `StateObject` -
     

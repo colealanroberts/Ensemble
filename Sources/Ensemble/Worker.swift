@@ -2,12 +2,23 @@ import Foundation
 
 // MARK: - `Worker` -
 
-/// A box type for managing asynchronous work.
-public struct Worker<T> {
-    
+/// A Worker manages asynchronous work and is parameterized over a Reducer and a result type `T`.
+/// Use a Worker to define a unit of work that can be executed asynchronously,
+/// and provides support for prioritization and error handling
+public struct Worker<T>: Sendable {
     enum Operation {
+        
+        /// No operation is currently being performed.
         case none
-        case task(() async -> T)
+        
+        /// The `Worker` is executing a task with the given `priority`, it's also passed "work",
+        /// represented as a closure that returns a result of type `T`.
+        /// An optional error handler can be specified to handle any errors that may occur.
+        case task(
+            priority: TaskPriority,
+            operation: () async throws -> T,
+            error: ((any Error) -> T)?
+        )
     }
     
     /// A unique identifier for the worker instance.
@@ -19,10 +30,13 @@ public struct Worker<T> {
     // MARK: - `Init` -
     
     /// Initializes a new worker with the given operation.
-    ///
+    /// - Parameter id: A unique ID representing this work, this default may be overriden
     /// - Parameter operation: The operation the worker will perform.
-    init(operation: Operation) {
-        self.id = UUID().uuidString
+    init(
+        id: String = UUID().uuidString,
+        operation: Operation
+    ) {
+        self.id = id
         self.operation = operation
     }
 }
@@ -31,16 +45,21 @@ public struct Worker<T> {
 
 extension Worker {
     
-    /// A worker instance that performs no operation.
+    /// A Worker instance that performs no operation.
     public static var none: Self {
         Self(operation: .none)
     }
     
-    /// Creates a worker instance with the given operation.
-    ///
+    /// Creates a Worker instance with the given operation.
+    /// - Parameter priority: The `TaskPriority` of the operation, defaulting to `.medium`
     /// - Parameter operation: The asynchronous operation the worker will perform.
+    /// - Parameter error: The error, if any, and `Action` to perform
     /// - Returns: A new `Worker` instance that performs the given operation.
-    public static func task(operation: @escaping () async -> T) -> Self {
-        Self(operation: .task(operation))
+    public static func task(
+        priority: TaskPriority = .medium,
+        _ operation: @escaping () async throws -> T,
+        error: ((any Error) -> T)? = nil
+    ) -> Self {
+        Self(operation: .task(priority: priority, operation: operation, error: error))
     }
 }

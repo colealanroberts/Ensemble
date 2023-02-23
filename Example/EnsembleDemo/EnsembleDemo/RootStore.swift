@@ -67,12 +67,8 @@ extension RootStore {
             state.selectedSection = section
             state.isFetching = true
             return .task {
-                do {
-                    let articles = try await sectionProvider.fetch(for: section)
-                    return .articles(articles)
-                } catch {
-                    return .articles([])
-                }
+                let articles = try await sectionProvider.fetch(for: section)
+                return .articles(articles)
             }
         case .webview(let isPresented):
             state.isPresentingWebView = isPresented

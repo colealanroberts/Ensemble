@@ -37,23 +37,19 @@ final class SectionProvider: SectionProviding {
         self.userDefaults = userDefaults
     }
     
-    func fetch(for section: Section) async -> [Article] {
+    func fetch(for section: Section) async throws -> [Article] {
         if let cached = cache[section], !userDefaults.shouldPerformFetch(for: section) {
             return cached
         }
-        let url = URL(string: "https://api.nytimes.com/svc/topstories/v2/\(section.slug).json?api-key=VS2HWCIFC39SUHtvqs0Lyqgv4oex0fk3")!
-        do {
-            let (data, _) = try await urlSession.data(from: url)
-            let response = try decoder.decode(Data<[Article]>.self, from: data)
-            let articles = response.results
-            cache[section] = articles
-            userDefaults.setLastCacheTime(for: section)
-            return articles
-        } catch {
-            assertionFailure(error.localizedDescription)
-        }
         
-        return []
+        let url = URL(string: "https://api.nytimes.com/svc/topstories/v2/\(section.slug).json?api-key=VS2HWCIFC39SUHtvqs0Lyqgv4oex0fk3")!
+        let (data, _) = try await urlSession.data(from: url)
+        let response = try decoder.decode(Data<[Article]>.self, from: data)
+        let articles = response.results
+        cache[section] = articles
+        userDefaults.setLastCacheTime(for: section)
+        
+        return articles
     }
 }
 
