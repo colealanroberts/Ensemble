@@ -2,11 +2,18 @@ import Foundation
 
 // MARK: - `Worker` -
 
-/// A box type for managing asynchronous work.
+/// A Worker manages asynchronous work and is parameterized over a Reducer and a result type `T`.
+/// Use a Worker to define a unit of work that can be executed asynchronously,
+/// and provides support for prioritization and error handling
 public struct Worker<Reducer: Reducing, T>: Sendable {
     enum Operation {
+        
+        /// No operation is currently being performed.
         case none
         
+        /// The `Worker` is executing a task with the given `priority`, it's also passed "work",
+        /// represented as a closure that returns a result of type `T`.
+        /// An optional error handler can be specified to handle any errors that may occur.
         case task(
             priority: TaskPriority,
             operation: () async throws -> T,
@@ -23,10 +30,13 @@ public struct Worker<Reducer: Reducing, T>: Sendable {
     // MARK: - `Init` -
     
     /// Initializes a new worker with the given operation.
-    ///
+    /// - Parameter id: A unique ID representing this work, this default may be overriden
     /// - Parameter operation: The operation the worker will perform.
-    init(operation: Operation) {
-        self.id = UUID().uuidString
+    init(
+        id: String = UUID().uuidString,
+        operation: Operation
+    ) {
+        self.id = id
         self.operation = operation
     }
 }
