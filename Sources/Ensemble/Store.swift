@@ -101,6 +101,12 @@ public final class Store<Reducer: Reducing>: ObservableObject {
             previousTask.cancel()
         }
         effectTasks[id] = Task(priority: priority) {
+            defer {
+                if let _ = effectTasks[id] {
+                    effectTasks[id] = nil
+                }
+            }
+            
             do {
                 let action = try await operation()
                 send(action)
