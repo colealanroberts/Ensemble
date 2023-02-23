@@ -23,8 +23,6 @@ extension RootStore {
         
         var articles: [Article]
         
-        var hasPerformedInitialLayout: Int
-        
         var isFetching: Bool
         
         var isPresentingWebView: Bool
@@ -36,16 +34,11 @@ extension RootStore {
         var sections: [Section] {
             Section.allCases
         }
-        
-        var shouldAnimateLayoutChanges: Bool {
-            isFetching && hasPerformedInitialLayout > 0
-        }
     }
     
     func initialState() -> State {
         .init(
             articles: [],
-            hasPerformedInitialLayout: 0,
             isFetching: false,
             isPresentingWebView: false,
             selectedArticle: nil,
@@ -58,8 +51,6 @@ extension RootStore {
         case .articles(let articles):
             state.isFetching = false
             state.articles = articles.filter(\.isPresentable)
-        case .performedInitialLayout:
-            state.hasPerformedInitialLayout += 1
         case .selectArticle(let article):
             state.selectedArticle = article
             state.isPresentingWebView = true
@@ -82,7 +73,6 @@ extension RootStore {
 extension RootStore {
     enum Action: Equatable {
         case articles([Article])
-        case performedInitialLayout
         case selectSection(Section)
         case selectArticle(Article)
         case webview(isPresented: Bool)
@@ -103,12 +93,8 @@ extension RootStore {
                             sink: sink
                         )
                     }
-                    .onAppear {
-                        sink.send(.performedInitialLayout)
-                    }
                 }
                 .frame(maxWidth: 600)
-                .animation(.easeIn, value: state.shouldAnimateLayoutChanges)
             }
             NavbarView(
                 state: state,
