@@ -5,7 +5,7 @@ import Foundation
 /// A Worker manages asynchronous work and is parameterized over a Reducer and a result type `T`.
 /// Use a Worker to define a unit of work that can be executed asynchronously,
 /// and provides support for prioritization and error handling
-public struct Worker<Reducer: Reducing, T>: Sendable {
+public struct Worker<T>: Sendable {
     enum Operation {
         
         /// No operation is currently being performed.
@@ -17,7 +17,7 @@ public struct Worker<Reducer: Reducing, T>: Sendable {
         case task(
             priority: TaskPriority,
             operation: () async throws -> T,
-            error: ((any Error) -> Reducer.Action)?
+            error: ((any Error) -> T)?
         )
     }
     
@@ -58,7 +58,7 @@ extension Worker {
     public static func task(
         priority: TaskPriority = .medium,
         _ operation: @escaping () async throws -> T,
-        error: ((any Error) -> Reducer.Action)? = nil
+        error: ((any Error) -> T)? = nil
     ) -> Self {
         Self(operation: .task(priority: priority, operation: operation, error: error))
     }

@@ -108,6 +108,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
             }
             
             do {
+                try Task.checkCancellation()
                 let action = try await operation()
                 send(action)
             } catch {
