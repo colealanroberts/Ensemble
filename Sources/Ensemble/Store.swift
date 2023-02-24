@@ -8,28 +8,27 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     
     // MARK: - `Public Properties` -
     
+    /// The current view rendered by the `Reducer` instance.
+    @Published public private(set) var view: Reducer.Rendering?
+    
+    /// The current state of the `Store`
+    @Published private(set) var state: Reducer.State
+    
     /// The `Sink` instance used by the `Reducer` instance.
-    public lazy var sink: Sink<Reducer> = {
-        .init(self)
-    }()
+    lazy var sink: Sink<Reducer> = { .init(self) }()
     
     // MARK: - `Private Properties` -
     
     /// The `Reducer` instance passed in the initializer.
     private let reducer: Reducer
     
-    /// The current state of the `Store`
-    @Published var state: Reducer.State
-    
-    /// The current view rendered by the `Reducer` instance.
-    @Published public var view: Reducer.Rendering?
-    
     /// Sends actions to the `reduce` method.
-    private var subject = PassthroughSubject<Reducer.Action, Never>()
+    private let subject: PassthroughSubject<Reducer.Action, Never>
     
     /// A set of `AnyCancellable` instances used to store the cancellable objects created by the `reduce` method.
     private var cancellables: Set<AnyCancellable>
     
+    /// A dictionary containing active `Task`s, if any
     private var effectTasks: [String: Task<Void, Never>]
     
     // MARK: - `Init` -
@@ -40,6 +39,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         self.reducer = reducer
         self.cancellables = .init()
         self.effectTasks = .init()
+        self.subject = .init()
         let state = reducer.initialState()
         self.state = state
         self.view = reducer.render(sink, state)
