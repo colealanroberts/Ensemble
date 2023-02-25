@@ -41,7 +41,7 @@ public struct Sink<Reducer: Reducing> {
     /// - Returns: A binding to the state value.
     public func bindState<Value: Equatable & Sendable>(
         to value: KeyPath<Reducer.State, Value>,
-        send action: @escaping @Sendable (Value) -> Reducer.Action
+        send action: @escaping (Value) -> Reducer.Action
     ) -> Binding<Value> {
         .init(
             get: { store.state[keyPath: value] },

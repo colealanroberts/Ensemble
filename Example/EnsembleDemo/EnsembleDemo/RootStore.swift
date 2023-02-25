@@ -75,7 +75,7 @@ extension RootStore {
         case articles([Article])
         case selectSection(Section)
         case selectArticle(Article)
-        case webview(isPresented: Bool)
+        case webview(Bool)
     }
 }
 
@@ -105,7 +105,7 @@ extension RootStore {
         .sheet(
             isPresented: sink.bindState(
                 to: \.isPresentingWebView,
-                send: { .webview(isPresented: $0) }
+                send: Action.webview
             ),
             content: {
                 if let url = state.selectedArticle?.url {
