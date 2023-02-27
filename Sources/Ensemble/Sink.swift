@@ -13,7 +13,7 @@ public struct Sink<Reducer: Reducing> {
     // MARK: - `Private Properties` -
     
     /// The store this sink is associated with
-    private let store: Store<Reducer>
+    private weak var store: Store<Reducer>?
     
     // MARK: - `Init` -
     
@@ -30,6 +30,9 @@ public struct Sink<Reducer: Reducing> {
     ///
     /// - Parameter action: The action to send to the store.
     public func send(_ action: Reducer.Action) {
+        guard let store else {
+            fatalError("Store cannot be nil!")
+        }
         store.send(action)
     }
     
@@ -43,7 +46,11 @@ public struct Sink<Reducer: Reducing> {
         to value: KeyPath<Reducer.State, Value>,
         send action: @escaping (Value) -> Reducer.Action
     ) -> Binding<Value> {
-        .init(
+        guard let store else {
+            fatalError("Store cannot be nil!")
+        }
+        
+        return .init(
             get: { store.state[keyPath: value] },
             set: { send(action($0)) }
         )
