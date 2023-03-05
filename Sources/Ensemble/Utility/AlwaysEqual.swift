@@ -12,7 +12,7 @@ import Foundation
 public struct AlwaysEqual<Value>: Equatable {
     
     /// The wrapped value of the property.
-    public let wrappedValue: Value
+    public var wrappedValue: Value
     
     /// Initializes an instance of `AlwaysEqual`.
     /// - Parameter wrappedValue: The value to be wrapped.
