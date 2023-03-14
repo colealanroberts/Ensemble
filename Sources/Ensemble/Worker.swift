@@ -14,10 +14,22 @@ public struct Worker<T>: Sendable {
         /// The `Worker` is executing a task with the given `priority`, it's also passed "work",
         /// represented as a closure that returns a result of type `T`.
         /// An optional error handler can be specified to handle any errors that may occur.
+        /// - Parameter priority: The priority level of the task.
+        /// - Parameter operation: The operation the worker will perform.
+        /// - Parameter error: A closure to perform, returning `T`.
         case task(
             priority: TaskPriority,
             operation: () async throws -> T,
             error: ((any Error) -> T)?
+        )
+        
+        /// Represents a stream of events that can be produced by a worker.
+        /// - Parameter priority: The priority level of the stream.
+        /// - Parameter operation: An asynchronous closure that takes a `Stream<T>` object
+        /// and produces events through it.
+        case stream(
+            priority: TaskPriority,
+            operation: (Stream<T>) async -> Void
         )
     }
     
@@ -61,5 +73,71 @@ extension Worker {
         error: ((any Error) -> T)? = nil
     ) -> Self {
         Self(operation: .task(priority: priority, operation: operation, error: error))
+    }
+    
+    /// Creates a new worker instance that produces a stream of events using the provided closure.
+    /// - Parameter id: A unique ID representing this work, this default may be overriden.
+    /// - Parameter priority: The priority level of the stream. Defaults to `.medium`.
+    /// - Parameter stream: An asynchronous closure that takes a `Stream<T>` object and produces events through it.
+    /// - Returns: A new worker instance with a `stream` operation.
+    public static func stream(
+        id: String,
+        priority: TaskPriority = .medium,
+        _ stream: @escaping (Stream<T>) async -> Void
+    ) -> Self {
+        Self(id: id, operation: .stream(priority: priority, operation: stream))
+    }
+}
+
+// MARK: - `Worker+Stream<T>` -
+
+/// An extension for the `Worker` class that provides a generic `Stream` type for sending asynchronous events.
+public extension Worker {
+    
+    /// A generic struct that provides a simple way to produce and send asynchronous events to an `AsyncStream<T>`.
+    struct Stream<T> {
+        /// The `AsyncStream<T>.Continuation` object.
+        let continuation: AsyncStream<T>.Continuation
+        
+        /// Initializes an instance of `Worker.Stream`.
+        /// - Parameter continuation: The `AsyncStream<T>.Continuation` object.
+        init(_ continuation: AsyncStream<T>.Continuation) {
+            self.continuation = continuation
+        }
+        
+        /// Sends an action to the `AsyncStream<T>.Continuation`.
+        /// - Parameter action: The action to be sent.
+        public func send(_ action: T) {
+            continuation.yield(action)
+        }
+        
+        /// Finishes the `AsyncStream<T>.Continuation`.
+        public func finish() {
+            continuation.finish()
+        }
+        
+        /// Marks as a callable function, this exists purely as syntactic sugar
+        /// - Note For example, consider the following:
+        /// In this example, we'll call `stream` as a function, passing in a `Reducer.Action`
+        /// to perform.
+        /// ```
+        /// extension FooReducer {
+        ///     func reduce(_ state: inout State, action: Action) -> Worker<Action> {
+        ///         switch action {
+        ///         case .observe:
+        ///          return .stream(id: "MyStream") { stream in
+        ///             for await value in SomeAsyncStream() {
+        ///                 stream(.update(value))
+        ///             }
+        ///          }
+        ///         case .update(let value):
+        ///             print(value)
+        ///         }
+        ///     }
+        /// }
+        /// ```
+        public func callAsFunction(_ action: T) {
+            send(action)
+        }
     }
 }
