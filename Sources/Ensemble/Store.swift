@@ -55,6 +55,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     // MARK: - `Public Methods` -
     
     /// Sends an `Action` to the `subject` instance.
+    /// - Parameter action: The action to dispatch
     func send(_ action: Reducer.Action) {
         subject.send(action)
     }
@@ -63,11 +64,18 @@ public final class Store<Reducer: Reducing>: ObservableObject {
     
     /// Receives actions from the `subject`, reduces them, and updates the store's state and view.
     /// It uses a `scan` operator to update the state and returns the updated state in a `sink` operator to update the view.
+    /// - Parameter reducer: The reducer on which to perform operations
     private func reduce(_ reducer: Reducer) {
         subject.scan(state) { [weak self] current, action in
             var copy = current
             let worker = reducer.reduce(&copy, action: action)
             switch worker.operation {
+            case .stream(let priority, let operation):
+                self?.runStream(
+                    id: worker.id,
+                    priority: priority,
+                    operation: operation
+                )
             case .task(let priority, let operation, let error):
                 self?.runEffect(
                     id: worker.id,
@@ -89,8 +97,53 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         .store(in: &cancellables)
     }
     
-    /// Asynchronous actions that are returned by the `Reducer`'s `reduce` method.
-    /// It runs the asynchronous action and sends the resulting action to the `subject` instance by calling the `send` method.
+    /// Runs a stream operation with the given `id`, `priority`, and `operation`.
+    ///
+    /// - Parameter id: A unique ID representing this work, this default may be overriden.
+    /// - Parameter priority: The priority level of the stream.
+    /// - Parameter operation: An asynchronous closure that takes a `Worker<Reducer.Action>.Stream<Reducer.Action>` object and produces events through it.
+    private func runStream(
+        id: String,
+        priority: TaskPriority,
+        operation: @escaping (Worker<Reducer.Action>.Stream<Reducer.Action>) async -> Void
+    ) {
+        if let previousTask = effectTasks[id] {
+            previousTask.cancel()
+        }
+        var continuation: AsyncStream<Reducer.Action>.Continuation?
+        let stream = AsyncStream<Reducer.Action> { ct in
+            continuation = ct
+        }
+        continuation?.onTermination = { @Sendable [weak self] _ in
+            if let _ = self?.effectTasks[id] {
+                self?.effectTasks[id] = nil
+            }
+        }
+        effectTasks[id] = Task(priority: priority) { [continuation] in
+            await withTaskGroup(
+                of: Void.self
+            ) { group in
+                _ = group.addTaskUnlessCancelled(priority: priority) {
+                    guard let continuation else {
+                        fatalError("Continuation should never be nil!")
+                    }
+                    await operation(.init(continuation))
+                }
+                _ = group.addTaskUnlessCancelled(priority: priority) {
+                    for await action in stream {
+                        self.send(action)
+                    }
+                }
+            }
+        }
+    }
+    
+    /// This private function executes an asynchronous effect specified by an operation and optional error handler.
+    ///
+    /// - Parameter id: A unique ID representing this work, this default may be overridden.
+    /// - Parameter priority: The priority at which the task should be executed.
+    /// - Parameter operation: The asynchronous operation to perform.
+    /// - Parameter onError: An optional error handler to handle any errors that may occur. If nil, the error will be ignored. If non-nil, the error handler should return an Action that will be sent back to the Store.
     private func runEffect(
         id: String,
         priority: TaskPriority,
@@ -106,13 +159,12 @@ public final class Store<Reducer: Reducing>: ObservableObject {
                     effectTasks[id] = nil
                 }
             }
-            
             do {
                 try Task.checkCancellation()
                 let action = try await operation()
                 send(action)
             } catch {
-                if let onError = onError {
+                if let onError {
                     send(onError(error))
                 }
             }
