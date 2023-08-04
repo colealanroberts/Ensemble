@@ -2,9 +2,7 @@ import Foundation
 
 // MARK: - `Worker` -
 
-/// A Worker manages asynchronous work and is parameterized over a Reducer and a result type `T`.
-/// Use a Worker to define a unit of work that can be executed asynchronously,
-/// and provides support for prioritization and error handling
+/// A Worker manages asynchronous work and provides support for task prioritization and error handling.
 public struct Worker<T>: Sendable {
     enum Operation {
         
@@ -77,7 +75,7 @@ extension Worker {
     
     /// Creates a new worker instance that produces a stream of events using the provided closure.
     /// - Parameter id: A unique ID representing this work, this default may be overriden.
-    /// - Parameter priority: The priority level of the stream. Defaults to `.medium`.
+    /// - Parameter priority: The `TaskPriority` of the operation, defaulting to `.medium`
     /// - Parameter stream: An asynchronous closure that takes a `Stream<T>` object and produces events through it.
     /// - Returns: A new worker instance with a `stream` operation.
     public static func stream(
@@ -116,10 +114,9 @@ public extension Worker {
             continuation.finish()
         }
         
-        /// Marks as a callable function, this exists purely as syntactic sugar
-        /// - Note For example, consider the following:
+        /// Marks `Stream` as a callable function and exists solely as syntactic sugar.
         /// In this example, we'll call `stream` as a function, passing in a `Reducer.Action`
-        /// to perform.
+        /// to perform each time a new event is received.
         /// ```
         /// extension FooReducer {
         ///     func reduce(_ state: inout State, action: Action) -> Worker<Action> {
