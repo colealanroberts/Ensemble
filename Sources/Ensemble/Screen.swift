@@ -3,15 +3,13 @@ import SwiftUI
 // MARK: - `Screen` -
 
 /// A SwiftUI view that encapsulates a stateful screen with a reducer.
-public struct Screen<Content: View, Reducer: Reducing>: View, Sendable {
-    
-    // MARK: - `StateObject` -
-    
-    @StateObject private var store: Store<Reducer>
+public struct Screen<Content: View, Reducer: Reducing>: View {
     
     // MARK: - `Private Properties` -
     
-    private let content: (Sink<Reducer>, Reducer.State) -> Content
+    @State private var store: Store<Reducer>
+    
+    let content: (Sink<Reducer>, Reducer.State) -> Content
     
     // MARK: - `Init` -
     
@@ -38,7 +36,7 @@ public struct Screen<Content: View, Reducer: Reducing>: View, Sendable {
         @ViewBuilder _ content: @escaping (Sink<Reducer>, Reducer.State) -> Content
     ) {
         self.content = content
-        self._store = StateObject(wrappedValue: store)
+        self.store = store
     }
     
     // MARK: - `Body` -
@@ -46,5 +44,7 @@ public struct Screen<Content: View, Reducer: Reducing>: View, Sendable {
     /// The view's body.
     public var body: some View {
         content(store.sink, store.state)
+        
+        let _ = Self._printChanges()
     }
 }

@@ -4,18 +4,18 @@ import SwiftUI
 // MARK: - `Store` -
 
 /// A `Store` class manages state in a Redux-style architecture. The `Store` class takes a generic type `Reducer` that conforms to the `Reducing` protocol.
-public final class Store<Reducer: Reducing>: ObservableObject {
+@Observable public final class Store<Reducer: Reducing> {
     
     // MARK: - `Public Properties` -
     
     /// The current view rendered by the `Reducer` instance.
-    @Published public private(set) var view: Reducer.Rendering?
+    public private(set) var view: Reducer.Rendering?
     
     /// The current state of the `Store`
-    @Published private(set) var state: Reducer.State
+    private (set) var state: Reducer.State
     
     /// The `Sink` instance used by the `Reducer` instance.
-    lazy var sink: Sink<Reducer> = { .init(self) }()
+    private(set) var sink: Sink<Reducer>!
     
     // MARK: - `Private Properties` -
     
@@ -42,6 +42,8 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         self.subject = .init()
         let state = reducer.initialState()
         self.state = state
+        let sink = Sink(self)
+        self.sink = sink
         self.view = reducer.render(sink, state)
         self.reduce(reducer)
     }
@@ -153,7 +155,7 @@ public final class Store<Reducer: Reducing>: ObservableObject {
         if let previousTask = effectTasks[id] {
             previousTask.cancel()
         }
-        effectTasks[id] = Task(priority: priority) {
+        effectTasks[id] = Task(priority: .userInitiated) {
             defer {
                 if let _ = effectTasks[id] {
                     effectTasks[id] = nil
@@ -162,7 +164,10 @@ public final class Store<Reducer: Reducing>: ObservableObject {
             do {
                 try Task.checkCancellation()
                 let action = try await operation()
-                send(action)
+                
+                await MainActor.run {
+                    send(action)
+                }
             } catch {
                 if let onError {
                     send(onError(error))
