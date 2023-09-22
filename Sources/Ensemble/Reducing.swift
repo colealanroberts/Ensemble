@@ -29,7 +29,7 @@ public protocol Reducing {
 }
 
 /// Provide a default implementation for any Store that wishes to utilize `Screen`,
-/// where providing a `render(sink:state)->Rendering` implementation isn't necessary
+/// where providing a `render(sink:state) -> Rendering` implementation isn't necessary
 
 public extension Reducing {
     func render(_ sink: Sink<Self>, _ state: State) -> EmptyView { EmptyView() }

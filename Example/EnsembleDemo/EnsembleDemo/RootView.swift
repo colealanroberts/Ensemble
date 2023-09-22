@@ -9,13 +9,6 @@ import Ensemble
 import SwiftUI
 
 struct RootView: View {
-    
-    @EnvironmentObject var rootStore: Store<RootStore>
-    
-    var body: some View {
-        NavigationView {
-            rootStore.view
-        }
-        .navigationViewStyle(.stack)
-    }
+    @State var rootStore: Store<RootStore>
+    var body: some View { rootStore.view }
 }

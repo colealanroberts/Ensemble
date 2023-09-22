@@ -82,41 +82,44 @@ extension RootStore {
 // MARK: - `Render` -
 
 extension RootStore {
-    @MainActor func render(_ sink: Sink<RootStore>, _ state: State) -> some View {
-        ZStack(alignment: .top) {
-            VStack {
-                ScrollView {
-                    Spacer().frame(height: 112)
-                    ForEach(state.articles) { article in
-                        ArticleView(
-                            article: article,
-                            sink: sink
-                        )
+    func render(_ sink: Sink<RootStore>, _ state: State) -> some View {
+        NavigationView {
+            ZStack(alignment: .top) {
+                VStack {
+                    ScrollView {
+                        Spacer().frame(height: 112)
+                        ForEach(state.articles) { article in
+                            ArticleView(
+                                article: article,
+                                sink: sink
+                            )
+                        }
+                    }
+                    .frame(maxWidth: 600)
+                }
+                NavbarView(
+                    state: state,
+                    sink: sink
+                )
+                .frame(maxWidth: .infinity, maxHeight: 96)
+            }
+            .sheet(
+                isPresented: sink.bindState(
+                    to: \.isPresentingWebView,
+                    send: Action.webview
+                ),
+                content: {
+                    if let url = state.selectedArticle?.url {
+                        WebView(url: url).ignoresSafeArea()
                     }
                 }
-                .frame(maxWidth: 600)
-            }
-            NavbarView(
-                state: state,
-                sink: sink
             )
-            .frame(maxWidth: .infinity, maxHeight: 96)
-        }
-        .sheet(
-            isPresented: sink.bindState(
-                to: \.isPresentingWebView,
-                send: Action.webview
-            ),
-            content: {
-                if let url = state.selectedArticle?.url {
-                    WebView(url: url).ignoresSafeArea()
-                }
+            .onAppear {
+                guard state.articles.isEmpty else { return }
+                sink.send(.selectSection(state.selectedSection))
             }
-        )
-        .onAppear {
-            guard state.articles.isEmpty else { return }
-            sink.send(.selectSection(state.selectedSection))
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
-        .toolbarBackground(.hidden, for: .navigationBar)
+        .navigationViewStyle(.stack)
     }
 }

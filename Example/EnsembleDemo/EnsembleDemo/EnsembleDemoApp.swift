@@ -37,7 +37,7 @@ struct EnsembleDemoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            RootView().environmentObject(Store(rootStore))
+            RootView(rootStore: .init(rootStore))
         }
     }
 }

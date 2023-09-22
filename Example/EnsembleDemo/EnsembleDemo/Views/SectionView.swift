@@ -22,8 +22,8 @@ struct SectionView: View {
             Spacer()
             Group {
                 ScrollViewReader { proxy in
-                    ScrollView( .horizontal, showsIndicators: false) {
-                        HStack(alignment: .center) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        LazyHStack(alignment: .center) {
                             ForEach(sections, id: \.self) { section in
                                 PillView(
                                     namespace: selectionIndicator,
@@ -90,6 +90,7 @@ fileprivate extension SectionView {
                     proxy?.scrollTo(section.title, anchor: .center)
                 }
             }
+            .id(section.title)
         }
         
         // MARK: - `Private Methods` -
