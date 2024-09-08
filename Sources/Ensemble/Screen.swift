@@ -1,19 +1,17 @@
 import SwiftUI
 
-// MARK: - `Screen` -
+// MARK: - Screen
 
 /// A SwiftUI view that encapsulates a stateful screen with a reducer.
-public struct Screen<Content: View, Reducer: Reducing>: View, Sendable {
+public struct Screen<Content: View, Reducer: Reducing>: View {
     
-    // MARK: - `StateObject` -
+    // MARK: Private Properties
     
-    @StateObject private var store: Store<Reducer>
+    @State private var store: Store<Reducer>
     
-    // MARK: - `Private Properties` -
+    let content: (Sink<Reducer>, Reducer.State) -> Content
     
-    private let content: (Sink<Reducer>, Reducer.State) -> Content
-    
-    // MARK: - `Init` -
+    // MARK: Init
     
     /// Initializes a new `Screen` view with a stateful reducer and a closure that provides the view content.
     ///
@@ -38,10 +36,10 @@ public struct Screen<Content: View, Reducer: Reducing>: View, Sendable {
         @ViewBuilder _ content: @escaping (Sink<Reducer>, Reducer.State) -> Content
     ) {
         self.content = content
-        self._store = StateObject(wrappedValue: store)
+        self.store = store
     }
     
-    // MARK: - `Body` -
+    // MARK: Body
     
     /// The view's body.
     public var body: some View {
