@@ -8,9 +8,6 @@ import SwiftUI
     
     // MARK: Public Properties
     
-    /// The current view rendered by the `Reducer` instance.
-    public private(set) var view: Reducer.Rendering?
-    
     /// The current state of the `Store`
     private (set) var state: Reducer.State
     
@@ -44,7 +41,6 @@ import SwiftUI
         self.state = state
         let sink = Sink(self)
         self.sink = sink
-        self.view = reducer.render(sink, state)
         self.reduce(reducer)
     }
     
@@ -94,7 +90,6 @@ import SwiftUI
         .sink { [weak self] in
             guard let self = self else { return }
             self.state = $0
-            self.view = reducer.render(self.sink, $0)
         }
         .store(in: &cancellables)
     }
