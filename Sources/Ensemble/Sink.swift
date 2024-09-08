@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - `Sink` -
+// MARK: - Sink
 
 /// `Sink` is a generic class that provides a way to interact with a `Store` by sending actions to it and
 /// binding state values to corresponding reducer actions.
@@ -10,12 +10,12 @@ import SwiftUI
 /// - Binding view properties to corresponding reducer actions via the `bindState` method.
 public struct Sink<Reducer: Reducing> {
     
-    // MARK: - `Private Properties` -
+    // MARK: Private Properties
     
     /// The store this sink is associated with
     private weak var store: Store<Reducer>?
     
-    // MARK: - `Init` -
+    // MARK: Init
     
     /// Initializes a new sink with the given store.
     ///
@@ -24,7 +24,7 @@ public struct Sink<Reducer: Reducing> {
         self.store = store
     }
     
-    // MARK: - `Public Methods` -
+    // MARK: Public Methods
     
     /// Sends the given action to the store.
     ///

@@ -1,11 +1,33 @@
 import Foundation
 
-// MARK: - `Worker` -
+// MARK: - Worker
 
 /// A Worker manages asynchronous work and provides support for task prioritization and error handling.
 public struct Worker<T>: Sendable {
+
+    /// A unique identifier for the worker instance.
+    let uuid: UUID
+
+    /// The operation the worker is performing.
+    let operation: Operation
+    
+    // MARK: Init
+    
+    /// Initializes a new worker with the given operation.
+    /// - Parameter operation: The operation the worker will perform.
+    private init(
+        uuid: UUID = .init(),
+        operation: Operation
+    ) {
+        self.uuid = uuid
+        self.operation = operation
+    }
+}
+
+// MARK: - Worker+Operation
+
+extension Worker {
     enum Operation {
-        
         /// No operation is currently being performed.
         case none
         
@@ -30,36 +52,16 @@ public struct Worker<T>: Sendable {
             operation: (Stream<T>) async -> Void
         )
     }
-    
-    /// A unique identifier for the worker instance.
-    let id: String
-    
-    /// The operation the worker is performing.
-    let operation: Operation
-    
-    // MARK: - `Init` -
-    
-    /// Initializes a new worker with the given operation.
-    /// - Parameter id: A unique ID representing this work, this default may be overriden
-    /// - Parameter operation: The operation the worker will perform.
-    init(
-        id: String = UUID().uuidString,
-        operation: Operation
-    ) {
-        self.id = id
-        self.operation = operation
-    }
 }
 
-// MARK: - `Worker+Utility` -
+// MARK: - Worker+Utility
 
 extension Worker {
-    
     /// A Worker instance that performs no operation.
     public static var none: Self {
         Self(operation: .none)
     }
-    
+
     /// Creates a Worker instance with the given operation.
     /// - Parameter priority: The `TaskPriority` of the operation, defaulting to `.medium`
     /// - Parameter operation: The asynchronous operation the worker will perform.
@@ -70,46 +72,58 @@ extension Worker {
         _ operation: @escaping () async throws -> T,
         error: ((any Error) -> T)? = nil
     ) -> Self {
-        Self(operation: .task(priority: priority, operation: operation, error: error))
+        Self(
+            operation: .task(
+                priority: priority,
+                operation: operation,
+                error: error
+            )
+        )
     }
-    
+
     /// Creates a new worker instance that produces a stream of events using the provided closure.
     /// - Parameter id: A unique ID representing this work, this default may be overriden.
     /// - Parameter priority: The `TaskPriority` of the operation, defaulting to `.medium`
     /// - Parameter stream: An asynchronous closure that takes a `Stream<T>` object and produces events through it.
     /// - Returns: A new worker instance with a `stream` operation.
     public static func stream(
-        id: String,
+        uuid: UUID,
         priority: TaskPriority = .medium,
         _ stream: @escaping (Stream<T>) async -> Void
     ) -> Self {
-        Self(id: id, operation: .stream(priority: priority, operation: stream))
+        Self(
+            uuid: uuid,
+            operation: .stream(
+                priority: priority,
+                operation: stream
+            )
+        )
     }
 }
 
-// MARK: - `Worker+Stream<T>` -
+// MARK: - Worker+Stream<U>
 
 /// An extension for the `Worker` class that provides a generic `Stream` type for sending asynchronous events.
 public extension Worker {
     
-    /// A generic struct that provides a simple way to produce and send asynchronous events to an `AsyncStream<T>`.
-    struct Stream<T> {
-        /// The `AsyncStream<T>.Continuation` object.
-        let continuation: AsyncStream<T>.Continuation
-        
+    /// A generic struct that provides a simple way to produce and send asynchronous events to an `AsyncStream<U>`.
+    struct Stream<U> {
+        /// The `AsyncStream<U>.Continuation` object.
+        let continuation: AsyncStream<U>.Continuation
+
         /// Initializes an instance of `Worker.Stream`.
         /// - Parameter continuation: The `AsyncStream<T>.Continuation` object.
-        init(_ continuation: AsyncStream<T>.Continuation) {
+        init(_ continuation: AsyncStream<U>.Continuation) {
             self.continuation = continuation
         }
         
-        /// Sends an action to the `AsyncStream<T>.Continuation`.
+        /// Sends an action to the `AsyncStream<U>.Continuation`.
         /// - Parameter action: The action to be sent.
-        public func send(_ action: T) {
+        public func send(_ action: U) {
             continuation.yield(action)
         }
         
-        /// Finishes the `AsyncStream<T>.Continuation`.
+        /// Finishes the `AsyncStream<U>.Continuation`.
         public func finish() {
             continuation.finish()
         }
@@ -133,7 +147,7 @@ public extension Worker {
         ///     }
         /// }
         /// ```
-        public func callAsFunction(_ action: T) {
+        public func callAsFunction(_ action: U) {
             send(action)
         }
     }

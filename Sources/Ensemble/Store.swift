@@ -1,12 +1,12 @@
 import Combine
 import SwiftUI
 
-// MARK: - `Store` -
+// MARK: - Store
 
 /// A `Store` class manages state in a Redux-style architecture. The `Store` class takes a generic type `Reducer` that conforms to the `Reducing` protocol.
 @Observable public final class Store<Reducer: Reducing> {
     
-    // MARK: - `Public Properties` -
+    // MARK: Public Properties
     
     /// The current view rendered by the `Reducer` instance.
     public private(set) var view: Reducer.Rendering?
@@ -17,7 +17,7 @@ import SwiftUI
     /// The `Sink` instance used by the `Reducer` instance.
     private(set) var sink: Sink<Reducer>!
     
-    // MARK: - `Private Properties` -
+    // MARK: Private Properties
     
     /// The `Reducer` instance passed in the initializer.
     private let reducer: Reducer
@@ -29,9 +29,9 @@ import SwiftUI
     private var cancellables: Set<AnyCancellable>
     
     /// A dictionary containing active `Task`s, if any
-    private var effectTasks: [String: Task<Void, Never>]
-    
-    // MARK: - `Init` -
+    private var effectTasks: [UUID: Task<Void, Never>]
+
+    // MARK: Init
     
     public init(
         _ reducer: Reducer
@@ -54,7 +54,7 @@ import SwiftUI
         }
     }
     
-    // MARK: - `Public Methods` -
+    // MARK: Public Methods
     
     /// Sends an `Action` to the `subject` instance.
     /// - Parameter action: The action to dispatch
@@ -62,7 +62,7 @@ import SwiftUI
         subject.send(action)
     }
     
-    // MARK: - `Private Methods` -
+    // MARK: Private Methods
     
     /// Receives actions from the `subject`, reduces them, and updates the store's state and view.
     /// It uses a `scan` operator to update the state and returns the updated state in a `sink` operator to update the view.
@@ -74,13 +74,13 @@ import SwiftUI
             switch worker.operation {
             case .stream(let priority, let operation):
                 self?.runStream(
-                    id: worker.id,
+                    uuid: worker.uuid,
                     priority: priority,
                     operation: operation
                 )
             case .task(let priority, let operation, let error):
                 self?.runEffect(
-                    id: worker.id,
+                    uuid: worker.uuid,
                     priority: priority,
                     operation: operation,
                     error: error
@@ -99,17 +99,17 @@ import SwiftUI
         .store(in: &cancellables)
     }
     
-    /// Runs a stream operation with the given `id`, `priority`, and `operation`.
+    /// Runs a stream operation with the given `uuid`, `priority`, and `operation`.
     ///
-    /// - Parameter id: A unique ID representing this work, this default may be overriden.
+    /// - Parameter uuid: A unique ID representing this work, this default may be overriden.
     /// - Parameter priority: The priority level of the stream.
     /// - Parameter operation: An asynchronous closure that takes a `Worker<Reducer.Action>.Stream<Reducer.Action>` object and produces events through it.
     private func runStream(
-        id: String,
+        uuid: UUID,
         priority: TaskPriority,
         operation: @escaping (Worker<Reducer.Action>.Stream<Reducer.Action>) async -> Void
     ) {
-        if let previousTask = effectTasks[id] {
+        if let previousTask = effectTasks[uuid] {
             previousTask.cancel()
         }
         var continuation: AsyncStream<Reducer.Action>.Continuation?
@@ -117,11 +117,11 @@ import SwiftUI
             continuation = ct
         }
         continuation?.onTermination = { @Sendable [weak self] _ in
-            if let _ = self?.effectTasks[id] {
-                self?.effectTasks[id] = nil
+            if let _ = self?.effectTasks[uuid] {
+                self?.effectTasks[uuid] = nil
             }
         }
-        effectTasks[id] = Task(priority: priority) { [continuation] in
+        effectTasks[uuid] = Task(priority: priority) { [continuation] in
             await withTaskGroup(
                 of: Void.self
             ) { group in
@@ -142,23 +142,23 @@ import SwiftUI
     
     /// This private function executes an asynchronous effect specified by an operation and optional error handler.
     ///
-    /// - Parameter id: A unique ID representing this work, this default may be overridden.
+    /// - Parameter uuid: A unique ID representing this work, this default may be overridden.
     /// - Parameter priority: The priority at which the task should be executed.
     /// - Parameter operation: The asynchronous operation to perform.
     /// - Parameter onError: An optional error handler to handle any errors that may occur. If nil, the error will be ignored. If non-nil, the error handler should return an Action that will be sent back to the Store.
     private func runEffect(
-        id: String,
+        uuid: UUID,
         priority: TaskPriority,
         operation: @escaping () async throws -> Reducer.Action,
         error onError: ((any Error) -> Reducer.Action)?
     ) {
-        if let previousTask = effectTasks[id] {
+        if let previousTask = effectTasks[uuid] {
             previousTask.cancel()
         }
-        effectTasks[id] = Task(priority: .userInitiated) {
+        effectTasks[uuid] = Task(priority: .userInitiated) {
             defer {
-                if let _ = effectTasks[id] {
-                    effectTasks[id] = nil
+                if let _ = effectTasks[uuid] {
+                    effectTasks[uuid] = nil
                 }
             }
             do {

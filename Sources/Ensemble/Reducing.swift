@@ -1,6 +1,6 @@
 import SwiftUI
 
-// MARK: - `Reducing` -
+// MARK: - Reducing
 
 /// The `Reducing` protocol defines a set of requirements for creating a reducer
 /// that can be used with the `Store` class.
@@ -30,7 +30,6 @@ public protocol Reducing {
 
 /// Provide a default implementation for any Store that wishes to utilize `Screen`,
 /// where providing a `render(sink:state) -> Rendering` implementation isn't necessary
-
 public extension Reducing {
     func render(_ sink: Sink<Self>, _ state: State) -> EmptyView { EmptyView() }
 }
