@@ -12,11 +12,9 @@ struct CounterStore: Reducing {
     
     // MARK: - State
     
-    struct State: Equatable {
-        var count: Int
+    struct State: StateIntializable {
+        var count: Int = 0
     }
-    
-    func initialState() -> State { .init(count: 0) }
     
     // MARK: - Action
     
