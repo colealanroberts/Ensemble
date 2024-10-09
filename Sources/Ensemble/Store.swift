@@ -150,7 +150,7 @@ import SwiftUI
         if let previousTask = effectTasks[uuid] {
             previousTask.cancel()
         }
-        effectTasks[uuid] = Task(priority: .userInitiated) {
+        effectTasks[uuid] = Task(priority: priority) {
             defer {
                 if let _ = effectTasks[uuid] {
                     effectTasks[uuid] = nil
