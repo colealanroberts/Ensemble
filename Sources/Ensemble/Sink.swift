@@ -42,8 +42,8 @@ public struct Sink<Reducer: Reducing> {
     ///   - value: The key path to the state value to bind.
     ///   - action: The reducer action to send when the state value changes.
     /// - Returns: A binding to the state value.
-    public func bindState<Value: Equatable & Sendable>(
-        to value: KeyPath<Reducer.State, Value>,
+    public func bind<Value: Equatable & Sendable>(
+        _ value: KeyPath<Reducer.State, Value>,
         send action: @escaping (Value) -> Reducer.Action
     ) -> Binding<Value> {
         guard let store else {
