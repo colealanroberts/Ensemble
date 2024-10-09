@@ -64,13 +64,14 @@ extension Worker {
 
     /// Creates a Worker instance with the given operation.
     /// - Parameter priority: The `TaskPriority` of the operation, defaulting to `.medium`
+    /// - Parameter onError:  An optional closure, if any, and `Action` to perform.
     /// - Parameter operation: The asynchronous operation the worker will perform.
-    /// - Parameter error: The error, if any, and `Action` to perform
     /// - Returns: A new `Worker` instance that performs the given operation.
     public static func task(
         priority: TaskPriority = .medium,
-        _ operation: @escaping () async throws -> T,
-        error: ((any Error) -> T)? = nil
+        error: ((any Error) -> T)? = nil,
+        _ operation: @escaping () async throws -> T
+
     ) -> Self {
         Self(
             operation: .task(
