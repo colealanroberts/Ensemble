@@ -20,7 +20,7 @@ public struct Screen<Content: View, Reducer: Reducing>: View {
     ///   - content: A closure that takes a sink and the current state of the reducer as parameters and returns a `View`.
     public init(
         reducer: Reducer,
-        @ViewBuilder _ content: @escaping (Sink<Reducer>, Reducer.State) -> Content
+        @ViewBuilder _ content: @escaping (_ sink: Sink<Reducer>, _ state: Reducer.State) -> Content
     ) {
         let store = Store(reducer)
         self.init(store: store, content)
@@ -33,7 +33,7 @@ public struct Screen<Content: View, Reducer: Reducing>: View {
     ///   - content: A closure that takes a sink and the current state of the reducer as parameters and returns a `View`.
     public init(
         store: Store<Reducer>,
-        @ViewBuilder _ content: @escaping (Sink<Reducer>, Reducer.State) -> Content
+        @ViewBuilder _ content: @escaping (_ sink: Sink<Reducer>, _ state: Reducer.State) -> Content
     ) {
         self.content = content
         self.store = store
